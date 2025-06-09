@@ -1,0 +1,33 @@
+/* Admin styles for Novel Ai plugin */
+
+/* Style for the settings page */
+.wrap h1 {
+    /* Add your styles for the settings page title */
+}
+
+/* Attempt to style the Novel Ai menu item background */
+/* WordPress generates an ID like 'toplevel_page_novel-ai-settings' for the <li> wrapping the menu link */
+#toplevel_page_novel-ai-settings .wp-menu-name,
+#toplevel_page_novel-ai-settings:hover .wp-menu-name,
+#toplevel_page_novel-ai-settings.current .wp-menu-name {
+    /* This might not directly change the background of the whole item due to WP structure */
+}
+
+/* More specific targeting for the menu item background */
+#adminmenu #toplevel_page_novel-ai-settings.menu-top-last a.menu-top,
+#adminmenu #toplevel_page_novel-ai-settings.menu-top-last:hover a.menu-top,
+#adminmenu #toplevel_page_novel-ai-settings.menu-top-last.current a.menu-top {
+    background-color: #2271b1 !important; /* WordPress blue, change as needed */
+    color: #fff !important; /* Ensure text is readable */
+}
+
+/* Style for the icon (if it's an SVG that needs styling, or if you want to adjust the Dashicon) */
+#toplevel_page_novel-ai-settings .wp-menu-image svg {
+    /* fill: #fff !important; */ /* Example: if your SVG icon needs a specific fill color on blue background */
+}
+
+/* When the menu is active/current */
+#adminmenu #toplevel_page_novel-ai-settings.current a.menu-top {
+    background-color: #1d5f96 !important; /* A slightly darker blue for active state */
+    color: #fff !important;
+}
