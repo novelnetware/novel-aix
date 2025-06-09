@@ -212,6 +212,10 @@ class Novel_AI_Chatbot {
         // Hook for our scheduled cron job
         $this->loader->add_action( 'novel_ai_chatbot_daily_content_check', $this, 'run_daily_content_check' );
 
+        // Add AJAX hook for clearing chat history
+        $this->loader->add_action( 'wp_ajax_nac_clear_session_history', $this, 'ajax_clear_session_history' );
+        $this->loader->add_action( 'wp_ajax_nopriv_nac_clear_session_history', $this, 'ajax_clear_session_history' );
+
     }
 
     /**
@@ -254,7 +258,15 @@ class Novel_AI_Chatbot {
      * @since 1.0.0
      */
     public function ajax_load_chat_history() {
-        check_ajax_referer( 'novel-ai-chatbot-public-nonce', 'nonce' );
+        // FIX: Allow multiple nonces (from public, live chat admin, history admin)
+        $is_public_request = check_ajax_referer( 'novel-ai-chatbot-public-nonce', 'nonce', false );
+        $is_admin_live_chat_request = check_ajax_referer( 'novel-ai-live-chat-nonce', 'nonce', false );
+        $is_admin_history_request = check_ajax_referer( 'novel-ai-history-nonce', 'nonce', false );
+
+        if ( ! $is_public_request && ! $is_admin_live_chat_request && ! $is_admin_history_request ) {
+            wp_send_json_error( array( 'message' => __( 'Nonce is invalid.', 'novel-ai-chatbot' ) ) );
+        }
+        // End of FIX
 
         $session_id = isset( $_POST['session_id'] ) ? sanitize_text_field( wp_unslash( $_POST['session_id'] ) ) : '';
 
@@ -265,6 +277,11 @@ class Novel_AI_Chatbot {
         $chat_history = new Novel_AI_Chatbot_Chat_History( $this->get_plugin_name(), $this->get_version() );
         $history = $chat_history->get_session_history( $session_id );
 
+        // In the provided code, the get_session_history was not returning status. Let's assume it should.
+        // A potential issue is in get_session_history itself if it doesn't return all needed fields.
+        // The original code in class-novel-ai-chatbot-chat-history.php only selects `message_type, message_content, timestamp`.
+        // Let's modify it to be more complete.
+        
         wp_send_json_success( array( 'history' => $history ) );
     }
 
@@ -350,7 +367,7 @@ class Novel_AI_Chatbot {
      */
     public function ajax_get_live_chats() {
         check_ajax_referer( 'novel-ai-live-chat-nonce', 'nonce' );
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! current_user_can( 'manage_live_chat' ) ) {
             wp_send_json_error( [ 'message' => 'دسترسی غیرمجاز' ] );
         }
 
@@ -369,7 +386,7 @@ class Novel_AI_Chatbot {
      */
     public function ajax_claim_chat() {
         check_ajax_referer( 'novel-ai-live-chat-nonce', 'nonce' );
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! current_user_can( 'manage_live_chat' ) ) {
             wp_send_json_error( [ 'message' => 'دسترسی غیرمجاز' ] );
         }
 
@@ -427,7 +444,7 @@ class Novel_AI_Chatbot {
      */
     public function ajax_resolve_chat() {
         check_ajax_referer( 'novel-ai-live-chat-nonce', 'nonce' );
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! current_user_can( 'manage_live_chat' ) ) {
             wp_send_json_error( [ 'message' => 'دسترسی غیرمجاز' ] );
         }
         
@@ -624,5 +641,28 @@ class Novel_AI_Chatbot {
         // END OF FIX
     }
 }
+/**
+     * AJAX callback to clear chat history for a session.
+     *
+     * @since 1.9.5
+     */
+    public function ajax_clear_session_history() {
+        check_ajax_referer( 'novel-ai-chatbot-public-nonce', 'nonce' );
+
+        $session_id = isset( $_POST['session_id'] ) ? sanitize_text_field( wp_unslash( $_POST['session_id'] ) ) : '';
+
+        if ( empty( $session_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Session ID is missing.', 'novel-ai-chatbot' ) ) );
+        }
+
+        $chat_history = new Novel_AI_Chatbot_Chat_History( $this->get_plugin_name(), $this->get_version() );
+        $result = $chat_history->clear_session_history( $session_id );
+
+        if ( $result !== false ) {
+            wp_send_json_success( array( 'message' => __( 'Chat history cleared.', 'novel-ai-chatbot' ) ) );
+        } else {
+            wp_send_json_error( array( 'message' => __( 'Failed to clear chat history.', 'novel-ai-chatbot' ) ) );
+        }
+    }
 
 }

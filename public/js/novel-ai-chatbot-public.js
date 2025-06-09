@@ -104,10 +104,14 @@ if (document.getElementById('novel-ai-chatbot-app')) {
                     
                     if (data.success) {
                         if (action === 'novel_ai_chatbot_get_response') {
+                            const botResponseText = data.data.response;
+                            // Check if the successful response is actually an error message from the backend
+                            const isErrorMessage = botResponseText && (botResponseText.includes('خطا:') || botResponseText.includes('Error:'));
+                            
                             messages.value.push({
-                                text: data.data.response,
+                                text: botResponseText,
                                 type: 'bot',
-                                isError: false
+                                isError: isErrorMessage // Set error status based on content
                             });
                         }
                     } else {
@@ -175,6 +179,30 @@ if (document.getElementById('novel-ai-chatbot-app')) {
                 const params = new URLSearchParams({ action: 'nac_submit_rating', nonce: novel_ai_chatbot_public_vars.nonce, session_id: novel_ai_chatbot_public_vars.session_id, rating });
                 await fetch(novel_ai_chatbot_public_vars.ajax_url, { method: 'POST', body: params });
             };
+
+            const refreshChat = async () => {
+                if (!confirm('آیا می‌خواهید این گفتگو را پاک کرده و از نو شروع کنید؟')) {
+                    return;
+                }
+                isLoading.value = true;
+                messages.value = []; // Clear messages on the frontend immediately
+
+                try {
+                    const params = new URLSearchParams({
+                        action: 'nac_clear_session_history',
+                        nonce: novel_ai_chatbot_public_vars.nonce,
+                        session_id: novel_ai_chatbot_public_vars.session_id
+                    });
+                    await fetch(novel_ai_chatbot_public_vars.ajax_url, { method: 'POST', body: params });
+                } catch (e) {
+                    console.error("Failed to clear session on server:", e);
+                } finally {
+                    // Add the initial welcome message back
+                    messages.value.push({ text: novel_ai_chatbot_public_vars.initialBotMessage, type: 'bot', isError: false });
+                    isLoading.value = false;
+                    scrollToBottom();
+                }
+            };
             
             onMounted(() => {
                 if(isOpen.value) loadHistory();
@@ -184,7 +212,8 @@ if (document.getElementById('novel-ai-chatbot-app')) {
             return {
                 isOpen, isLoading, userInput, messages, chatMessagesEl, displayMode, chatMode,
                 ratingSubmitted, hoverRating, showWelcomeScreen, showRatingBox, showAgentRequestButton,
-                toggleChat, sendMessage, requestLiveAgent, toggleFullscreen, setHoverRating, resetHoverRating, submitRating
+                toggleChat, sendMessage, requestLiveAgent, toggleFullscreen, setHoverRating, resetHoverRating, submitRating,
+                refreshChat // <-- Add this
             };
         }
     }).mount('#novel-ai-chatbot-app');

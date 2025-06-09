@@ -49,10 +49,10 @@ import { createApp, ref, onMounted, watch } from 'https://unpkg.com/vue@3/dist/v
                     try {
                          const params = new URLSearchParams({
                             action: 'nac_get_session_history',
-                            nonce: nac_live_chat_vars.nonce, // We can reuse the live chat nonce or create a new one
+                            nonce: nac_history_vars.nonce, // <-- FIX
                             session_id: convo.session_id
                         });
-                        const response = await fetch(nac_live_chat_vars.ajax_url, { method: 'POST', body: params });
+                        const response = await fetch(nac_history_vars.ajax_url, { method: 'POST', body: params }); // <-- FIX
                         const data = await response.json();
                         if (data.success) {
                             selectedChatMessages.value = data.data.history;

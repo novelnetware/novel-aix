@@ -48,6 +48,7 @@ class Novel_AI_Chatbot_Public {
         if ($widget_position === 'bottom-left') {
             $position_css = "
                 #novel-ai-chatbot-app {
+                position: fixed;
                     right: auto;
                     left: 20px;
                     bottom: 20px;
@@ -57,6 +58,7 @@ class Novel_AI_Chatbot_Public {
         } else {
             $position_css = "
                 #novel-ai-chatbot-app {
+                position: fixed;
                     left: auto;
                     right: 20px;
                     bottom: 20px;

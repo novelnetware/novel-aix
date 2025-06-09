@@ -3,7 +3,7 @@
  * Plugin Name: Novel AI Chatbot
  * Plugin URI:  https://novelnetware.com/novel-ai-chatbot
  * Description: An intelligent chatbot plugin for WordPress, powered by various AI models.
- * Version:     1.9.4
+ * Version:     1.9.6
  * Author:      Novelnetware
  * Author URI:  https://novelnetware.com
  * License:     GPL-2.0+

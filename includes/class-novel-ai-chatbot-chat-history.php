@@ -120,7 +120,7 @@ class Novel_AI_Chatbot_Chat_History {
         }
 
         $query = $wpdb->prepare(
-            "SELECT message_type, message_content, timestamp
+            "SELECT id, session_id, user_id, agent_id, status, message_type, message_content, timestamp
              FROM {$this->table_name}
              WHERE session_id = %s
              ORDER BY timestamp ASC
@@ -302,7 +302,7 @@ class Novel_AI_Chatbot_Chat_History {
 
         $status_placeholder = is_array($status) ? implode(', ', array_fill(0, count($status), '%s')) : '%s';
         
-        $sql = $wpdb->prepare(
+       $sql = $wpdb->prepare(
             "SELECT T1.session_id, T1.user_id, T1.agent_id, T1.status, T1.last_message, T1.last_timestamp
              FROM (
                  SELECT
@@ -318,7 +318,7 @@ class Novel_AI_Chatbot_Chat_History {
              WHERE T1.rn = 1 AND T1.status IN ({$status_placeholder})
              ORDER BY T1.last_timestamp DESC
              LIMIT %d",
-            (is_array($status) ? $status : [$status]),
+            $status, // <-- FIX: Pass the status variable directly
             absint($limit)
         );
 

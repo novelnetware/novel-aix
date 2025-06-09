@@ -134,7 +134,7 @@ class Novel_AI_Chatbot_AI_Integration {
                 'Authorization' => 'Bearer ' . $api_key,
             ),
             'timeout'     => 30, // seconds
-            'sslverify'   => false, // Set to true in production if you have proper SSL setup
+            'sslverify'   => true, // Set to true in production if you have proper SSL setup
             'method'      => 'POST',
             'data_format' => 'body',
         );
@@ -190,7 +190,7 @@ class Novel_AI_Chatbot_AI_Integration {
                 'Content-Type' => 'application/json',
             ),
             'timeout'     => 30,
-            'sslverify'   => false,
+            'sslverify'   => true,
             'method'      => 'POST',
             'data_format' => 'body',
         );
@@ -239,7 +239,7 @@ class Novel_AI_Chatbot_AI_Integration {
                 'Authorization' => 'Bearer ' . $api_key,
             ),
             'timeout'     => 30,
-            'sslverify'   => false,
+            'sslverify'   => true,
             'method'      => 'POST',
             'data_format' => 'body',
         );
@@ -416,7 +416,7 @@ class Novel_AI_Chatbot_AI_Integration {
 				'Content-Type' => 'application/json',
 			),
 			'timeout'     => 45, // Increased timeout for embedding larger batches
-			'sslverify'   => false, // Should be true in production with proper SSL
+			'sslverify'   => true, // Should be true in production with proper SSL
 			'method'      => 'POST',
 			'data_format' => 'body',
 		);
